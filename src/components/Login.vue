@@ -2,7 +2,7 @@
     <div :class="[$style.main, $style.center]">
         <div :class="[$style.box, $style.center]">
             <div :class="[$style.icon, $style.center]">
-                <i class="far fa-user"></i>
+                <i class="fas fa-snowboarding"></i>
             </div>
             <h1>Login</h1>
             <div>
@@ -11,21 +11,24 @@
             </div>
             <div>
                 <p>Password:</p>
-                <input type="text" name="" id="" placeholder="Enter your password">
+                <input type="text" name="" id="" placeholder="Enter your password" />
             </div>
-            <button :class="$style.btn">Login</button>
+            <button :class="$style.btn" @click="login">Login</button>
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    
-}
+    methods: {
+        login() {
+            document.location.href = "/#/forum";
+        },
+    },
+};
 </script>
 
-<style module>
-
+<style lang="scss" module>
 .center {
     display: flex;
     justify-content: center;
@@ -33,8 +36,8 @@ export default {
 }
 
 .main {
-    width: 100%;
-    height: 100vh;
+    height: auto;
+    margin: 30px 0 30px 0;
 }
 
 .box {
@@ -45,7 +48,7 @@ export default {
     margin: 0 20px;
     overflow: hidden;
     flex-direction: column;
-    position: fixed;
+    position: relative;
 }
 
 .box div {
@@ -57,8 +60,7 @@ export default {
     margin-bottom: 5px;
 }
 
-.box div input{
-    position: unset;
+.box div input {
     width: 220px;
     height: 30px;
     margin-top: 5px;
@@ -71,33 +73,33 @@ export default {
     transition: border-bottom 300ms;
 }
 
-.box div input:focus{
+.box div input:focus {
     border-bottom: 2px solid #4f58ff;
 }
 
-.box h1{
+.box h1 {
     margin: 60px 0 20px 0;
 }
 
-.box .icon{
+.box .icon {
     position: absolute;
     top: -20px;
     left: 0;
     width: 100%;
     height: 100px;
-    border-radius: 0 0 50% 50%;
+    border-radius: 0 0 0 50%;
     background: #4f58ff;
     box-shadow: 0px 0px 20px rgb(144, 144, 144);
     align-items: flex-end;
 }
 
-.box .icon i{
+.box .icon i {
     color: white;
-    margin-bottom: 10px;
+    transform: rotate(-35deg);
     font-size: 2rem;
 }
 
-.btn{
+.btn {
     width: 220px;
     height: 30px;
     margin-top: 20px;
@@ -106,7 +108,7 @@ export default {
     outline: none;
     background: #4f58ff;
     color: white;
+    font-size: large;
     border-radius: 10px;
 }
-
 </style>

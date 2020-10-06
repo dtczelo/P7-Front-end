@@ -1,6 +1,7 @@
 <template>
-  <div class="home">
+  <div class="home" :class="$mq">
     <Login></Login>
+    <Sign_Up></Sign_Up>
   </div>
 
 
@@ -9,16 +10,27 @@
 <script>
 // @ is an alias to /src
 import Login from '../components/Login'
+import Sign_Up from '../components/Sign_Up'
 
 export default {
   name: 'Home',
   components: {
-    Login
+    Login,
+    Sign_Up
   }
 }
 </script>
 
 
-<style scoped>
+<style lang="scss" scoped>
+
+.home {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-around;
+  &.mobile {
+    flex-direction: column;
+  }
+}
 
 </style>

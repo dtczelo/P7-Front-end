@@ -32,7 +32,7 @@ export default {
 }
 </script>
 
-<style module>
+<style lang="scss" module>
 .center {
     display: flex;
     justify-content: center;
@@ -40,19 +40,19 @@ export default {
 }
 
 .main {
-    width: 100%;
-    height: 100vh;
+    height: auto;
+    margin: 30px 0 30px 0;
 }
 
 .box {
-    width: 20em;
+    width: 18em;
     height: 620px;
     background: white;
     color: black;
     margin: 0 20px;
     overflow: hidden;
     flex-direction: column;
-    position: fixed;
+    position: relative;
 }
 
 .box div {
@@ -113,6 +113,7 @@ export default {
     outline: none;
     background: #4f58ff;
     color: white;
+    font-size: large;
     border-radius: 10px;
 }
 
