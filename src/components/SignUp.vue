@@ -1,36 +1,48 @@
 <template>
-    <section :class="[$style.main, $style.center]">
+    <div :class="[$style.main, $style.center]">
         <div :class="[$style.box, $style.center]">
             <div :class="[$style.icon, $style.center]">
-                <i class="fas fa-snowboarding"></i>
+                <i class="far fa-user"></i>
             </div>
-            <h1>Connexion</h1>
-            <form id="formLogin">
+            <h1>Sign up</h1>
+            <form id="formSignup">
+                <div>
+                    <p>Lastname:</p>
+                    <input type="text" placeholder="Enter your lastname" v-model="lastname" />
+                </div>
+                <div>
+                    <p>Firstname:</p>
+                    <input type="text" placeholder="Enter your firstname" v-model="firstname" />
+                </div>
                 <div>
                     <p>Email:</p>
-                    <input type="email" placeholder="Entrez votre email" v-model="email" />
+                    <input type="email" placeholder="Enter your email" v-model="email" />
                 </div>
                 <div>
                     <p>Password:</p>
-                    <input type="password" placeholder="Entrez votre mot de passe" v-model="password" />
+                    <input type="password" placeholder="Enter your password" v-model="password" />
                 </div>
-                <button type="submit" :class="$style.btn" @click.prevent="login">Login</button>
+                <button type="submit" :class="$style.btn" @click.prevent="signUp">Sign up</button>
             </form>
         </div>
-    </section>
+    </div>
 </template>
 
 <script>
 export default {
     data() {
         return {
+            lastname: "",
+            firstname: "",
             email: "",
             password: "",
         };
     },
     methods: {
-        login() {
+        signUp() {
             var form = {
+                lastname: this.lastname,
+                firstname: this.firstname,
                 email: this.email,
                 password: this.password,
             };
@@ -42,7 +54,7 @@ export default {
                 },
                 body: JSON.stringify(form),
             };
-            fetch("http://localhost:3000/users/login", myInit).then((response) => {
+            fetch("http://localhost:3000/signup", myInit).then((response) => {
                 response.text().then((response) => {
                     console.log(JSON.parse(response));
                 });
@@ -61,7 +73,7 @@ export default {
 
 .box {
     width: 18em;
-    height: 450px;
+    height: 620px;
     background: white;
     color: black;
     margin: 0 20px;
@@ -81,6 +93,7 @@ export default {
 }
 
 .box div input {
+    position: unset;
     width: 220px;
     height: 30px;
     margin-top: 5px;
@@ -107,7 +120,7 @@ export default {
     left: 0;
     width: 100%;
     height: 100px;
-    border-radius: 0 0 0 50%;
+    border-radius: 0 0 50% 50%;
     background: linear-gradient(120deg, #b20a2c, #fffbd5);
     box-shadow: 0px 0px 20px rgb(144, 144, 144);
     align-items: flex-end;
@@ -115,7 +128,7 @@ export default {
 
 .box .icon i {
     color: white;
-    transform: rotate(-35deg);
+    margin-bottom: 10px;
     font-size: 2rem;
 }
 

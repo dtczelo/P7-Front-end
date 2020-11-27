@@ -1,16 +1,23 @@
 <template>
     <div id="app">
-        <div id="nav">
-            <router-link to="/">Home</router-link> |
-            <router-link to="/forum">Forum</router-link>
-        </div>
-            <router-view />
+        <Header></Header>
+        <router-view />
     </div>
 </template>
 
 <script>
+import Header from "./components/Header";
+
 export default {
-    components: {},
+    components: {
+        Header,
+    },
+    data() {
+        return {};
+    },
+    created() {
+        window.addEventListener("resize", this.$store.commit("setWindowWidth"));
+    },
 };
 </script>
 
@@ -28,23 +35,8 @@ body {
     text-align: center;
     color: #2c3e50;
     min-height: 100vh;
-    background: linear-gradient(-16deg, #1461e4, #87e077);
-}
-
-.views {
-  
-}
-
-#nav {
-    padding: 30px;
-}
-
-#nav a {
-    font-weight: bold;
-    color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-    color: #42b983;
+    background: #fffbd5;
+    background: -webkit-linear-gradient(to right, #b20a2c, #fffbd5);
+    background: linear-gradient(to right, #b20a2c, #fffbd5);
 }
 </style>
