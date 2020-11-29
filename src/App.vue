@@ -38,5 +38,6 @@ body {
     background: #fffbd5;
     background: -webkit-linear-gradient(to right, #b20a2c, #fffbd5);
     background: linear-gradient(to right, #b20a2c, #fffbd5);
+    z-index: -2;
 }
 </style>

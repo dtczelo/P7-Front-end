@@ -4,23 +4,23 @@
             <div :class="[$style.icon, $style.center]">
                 <i class="far fa-user"></i>
             </div>
-            <h1>Sign up</h1>
+            <h1>Inscription</h1>
             <form id="formSignup">
                 <div>
-                    <p>Lastname:</p>
-                    <input type="text" placeholder="Enter your lastname" v-model="lastname" />
+                    <p>Nom:</p>
+                    <input type="text" placeholder="Entrez votre nom" v-model="lastname" />
                 </div>
                 <div>
-                    <p>Firstname:</p>
-                    <input type="text" placeholder="Enter your firstname" v-model="firstname" />
+                    <p>Prénom:</p>
+                    <input type="text" placeholder="Entrez votre prénom" v-model="firstname" />
                 </div>
                 <div>
                     <p>Email:</p>
-                    <input type="email" placeholder="Enter your email" v-model="email" />
+                    <input type="email" placeholder="Entrez votre email" v-model="email" />
                 </div>
                 <div>
                     <p>Password:</p>
-                    <input type="password" placeholder="Enter your password" v-model="password" />
+                    <input type="password" placeholder="Entrez votre mot de passe" v-model="password" />
                 </div>
                 <button type="submit" :class="$style.btn" @click.prevent="signUp">Sign up</button>
             </form>
