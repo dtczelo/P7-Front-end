@@ -16,7 +16,7 @@
                     placeholder="Titre (max= 255 caractères)"
                     maxlength="255"
                     autofocus
-                    v-model="title"
+                    v-model="formTitle"
                 ></textarea>
                 <label for="image">Insérer une image</label>
                 <input name="image" type="file" id="image" />
@@ -25,47 +25,23 @@
         </div>
 
         <div class="posts-container">
-            <div class="post">
-                <div class="post__contents">
-                    <p class="post__author">Par "bidule" le 28 nov. 2020 18:50</p>
-                    <p class="post__title">Une image pour l'exemple blablabla</p>
-                    <div class="post__img">
-                        <img src="../assets/images/icon-left-font.png" />
-                    </div>
-                </div>
-                <div class="post__buttons">
-                    <button class="post__button post__button--modify">Modifier</button>
-                    <button class="post__button post__button--delete">Supprimer</button>
-                    <button class="post__button post__button--comments">Voir les commentaires</button>
-                </div>
-            </div>
-
-            <div class="post">
-                <div class="post__contents">
-                    <p class="post__author">Par "bidule" le 28 nov. 2020 18:50</p>
-                    <p class="post__title">Une image pour l'exemple blablabla</p>
-                    <div class="post__img">
-                        <img src="../assets/images/mushrooms.jpg" />
-                    </div>
-                </div>
-                <div class="post__buttons">
-                    <button class="post__button post__button--modify">Modifier</button>
-                    <button class="post__button post__button--delete">Supprimer</button>
-                    <button class="post__button post__button--comments">Voir les commentaires</button>
-                </div>
+            <div v-for="post in postsToDisplayed" :key="post.id">
+                <Post :author="post.author" :id="post.id" :user_id="post.user_id" :date="post.date" :title="post.title"></Post>
             </div>
         </div>
     </main>
 </template>
 
 <script>
+import Post from "../components/Post.vue";
 export default {
     name: "Accueil",
-    components: {},
+    components: { Post },
     data() {
         return {
+            postsToDisplayed: [],
             isFormDisplayed: false,
-            title: this.title,
+            formTitle: this.title,
         };
     },
     methods: {
@@ -75,16 +51,14 @@ export default {
         postData() {
             var form = {
                 user_id: 2,
-                title: this.title
+                title: this.formTitle
                 // image: this.image,
             };
             fetch("http://localhost:3000/posts/", {
                 method: "POST",
                 headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-                mode: 'no-cors',
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify(form),
             }).then((response) => {
                 response.text().then((response) => {
@@ -92,6 +66,16 @@ export default {
                 });
             });
         },
+    },
+    beforeMount() {
+        // GET ALL POSTS
+        fetch("http://localhost:3000/posts/", {
+            method: "GET"
+        }).then((response) => {
+            response.text().then((response) => {
+                this.postsToDisplayed = JSON.parse(response).results;
+            });
+        });
     },
 };
 </script>
@@ -153,7 +137,6 @@ export default {
 
 .posts-container {
     width: 100%;
-    height: auto;
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -161,69 +144,5 @@ export default {
     background: white;
     border-radius: 10px;
     box-shadow: 15px 10px 38px -9px rgba(0, 0, 0, 0.75);
-}
-
-.post {
-    display: flex;
-    border: 2px solid black;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    &__contents {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    &__author {
-        font-size: 1vw;
-        color: #2c3e50;
-    }
-    &__title {
-        font-size: 2vw;
-    }
-    &__img {
-        width: 70%;
-        max-height: 500px;
-        & img {
-            width: 100%;
-            max-height: 500px;
-            object-fit: contain;
-        }
-    }
-    &__buttons {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        align-items: center;
-    }
-    &__button {
-        border: none;
-        border-radius: 28px;
-        display: inline-block;
-        cursor: pointer;
-        color: #ffffff;
-        font-family: Arial;
-        font-size: 17px;
-        padding: 16px 31px;
-        text-decoration: none;
-        box-shadow: 9px 5px 15px -9px rgba(0, 0, 0, 0.75);
-        &:hover {
-            background-color: #5cbf2a;
-        }
-        &:active {
-            position: relative;
-            top: 1px;
-        }
-        &--modify {
-            background-color: #ffae00;
-        }
-        &--delete {
-            background-color: #fd2d01;
-        }
-        &--comments {
-            background-color: #0059a0;
-        }
-    }
 }
 </style>
