@@ -44,7 +44,13 @@ export default {
             };
             fetch("http://localhost:3000/users/login", myInit).then((response) => {
                 response.text().then((response) => {
-                    console.log(JSON.parse(response));
+                    var data = JSON.parse(response);
+                    if (data.verifyPassword) {
+                        sessionStorage.setItem("userId", data.userId);
+                        sessionStorage.setItem("token", data.token);
+                        sessionStorage.setItem("password", data.verifyPassword);
+                        this.$router.push({name: "Accueil"});
+                    }
                 });
             });
         },
@@ -94,7 +100,7 @@ export default {
 }
 
 .box div input:focus {
-    border-bottom: 2px solid #b20a2c;
+    // border-bottom: 2px solid #b20a2c;
 }
 
 .box h1 {

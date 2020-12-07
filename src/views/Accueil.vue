@@ -1,6 +1,6 @@
 <template>
     <main class="home">
-        <a class="create-post" @click="toggleForm()"
+        <a class="create-post" :class="{ displayed: isFormButtonDisplayed }" @click="toggleForm()"
             ><i class="fas fa-plus-circle"></i><br />
             Publier</a
         >
@@ -20,13 +20,22 @@
                 ></textarea>
                 <label for="image">Insérer une image</label>
                 <input name="image" type="file" id="image" />
-                <button @click.prevent="postData()">Publier</button>
+                <button class="post__button" v-if="formForPublish === true" @click.prevent="postData()">Publier</button>
+                <button class="post__button" v-else @click="modifyData()">Modifier</button>
             </form>
         </div>
 
         <div class="posts-container">
             <div v-for="post in postsToDisplayed" :key="post.id">
-                <Post :author="post.author" :id="post.id" :user_id="post.user_id" :date="post.date" :title="post.title"></Post>
+                <Post
+                    :author="post.author"
+                    :id="post.id"
+                    :user_id="post.user_id"
+                    :date="post.date"
+                    :title="post.title"
+                    :imageUrl="post.image_url"
+                    @modify-post="modifyPost"
+                ></Post>
             </div>
         </div>
     </main>
@@ -39,41 +48,75 @@ export default {
     components: { Post },
     data() {
         return {
+            formForPublish: true,
             postsToDisplayed: [],
+            isFormButtonDisplayed: false,
             isFormDisplayed: false,
             formTitle: this.title,
+            postTomodify_id: 0,
         };
     },
     methods: {
         toggleForm() {
+            this.formForPublish = true;
             this.isFormDisplayed = !this.isFormDisplayed;
         },
         postData() {
-            var form = {
-                user_id: 2,
-                title: this.formTitle
-                // image: this.image,
-            };
+            var form = new FormData();
+            form.append("user_id", sessionStorage.getItem("userId"));
+            form.append("title", this.formTitle);
+            form.append("file", document.getElementById("image").files[0]);
             fetch("http://localhost:3000/posts/", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "authorization": sessionStorage.getItem("token"),
                 },
-                body: JSON.stringify(form),
+                body: form,
             }).then((response) => {
                 response.text().then((response) => {
                     console.log(JSON.parse(response));
                 });
             });
         },
+        modifyData() {
+            var form = new FormData();
+            form.append("user_id", sessionStorage.getItem("userId"));
+            form.append("title", this.formTitle);
+            form.append("file", document.getElementById("image").files[0]);
+            fetch("http://localhost:3000/posts/" + this.postTomodify_id, {
+                method: "PUT",
+                headers: {
+                    "authorization": sessionStorage.getItem("token"),
+                },
+                body: form,
+            }).then((response) => {
+                response.text().then((response) => {
+                    console.log(JSON.parse(response));
+                    this.toggleForm();
+                });
+            });
+        },
+        modifyPost(payload) {
+            this.toggleForm();
+            this.formForPublish = false;
+            this.formTitle = payload.title;
+            this.postTomodify_id = payload.id;
+        },
     },
     beforeMount() {
+        // USER LOGIN ?
+        if (sessionStorage.getItem("password")) {
+            this.isFormButtonDisplayed = true;
+        }
         // GET ALL POSTS
         fetch("http://localhost:3000/posts/", {
-            method: "GET"
+            method: "GET",
         }).then((response) => {
             response.text().then((response) => {
-                this.postsToDisplayed = JSON.parse(response).results;
+                for (var post of JSON.parse(response).results) {
+                    post.date = new Date(post.date).toLocaleString();
+                    this.postsToDisplayed.push(post);
+                }
             });
         });
     },
@@ -82,13 +125,25 @@ export default {
 
 <style lang="scss">
 .home {
-    padding: 9vh 2rem 0 2rem;
+    min-height: 70vh;
     display: flex;
     justify-content: space-around;
+    padding: 9vh 10rem 18vh 10rem;
     opacity: 0.99;
+}
+@media (max-width: 1060px) {
+    .home {
+        padding: 9vh 2rem 0 2rem;
+    }
+}
+@media (max-width: 490px) {
+    .home {
+        padding: 9vh 0.5rem 0 0.5rem;
+    }
 }
 
 .create-post {
+    display: none;
     position: fixed;
     height: 40px;
     width: 100px;
@@ -106,11 +161,12 @@ export default {
 }
 
 .form-container {
-    width: 80%;
+    width: 40%;
     height: 300px;
     position: fixed;
     padding: 40px;
     background: rgb(243, 243, 243);
+    box-shadow: 10px 7px 20px -9px rgba(0, 0, 0, 0.72);
     overflow: hidden;
     z-index: 2;
     & form {
@@ -134,6 +190,15 @@ export default {
         float: left;
     }
 }
+@media (max-width: 764px) {
+    .form-container {
+        width: 90%;
+        padding: 20px;
+        & label {
+            font-weight: bold;
+        }
+    }
+}
 
 .posts-container {
     width: 100%;
@@ -144,5 +209,14 @@ export default {
     background: white;
     border-radius: 10px;
     box-shadow: 15px 10px 38px -9px rgba(0, 0, 0, 0.75);
+}
+@media (max-width: 490px) {
+    .posts-container {
+        padding: 5px;
+    }
+}
+
+.displayed {
+    display: block;
 }
 </style>

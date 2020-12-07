@@ -6,20 +6,24 @@
             <router-link style="text-decoration: none;" to="/inscription">Inscription</router-link>
         </div>
         <div class="logo">
-            <img src="../assets/images/icon-above-font.png" width="120" height="120" alt="Logo de l'entreprise Groupomania" />
+            <img src="../assets/images/icon-above-font.png" alt="Logo de l'entreprise Groupomania" />
         </div>
         <nav :class="{ displayed: isMenuDisplayed }">
             <router-link style="text-decoration: none;" to="/">Home</router-link> |
             <router-link style="text-decoration: none;" to="/connexion">Connexion</router-link> |
             <router-link style="text-decoration: none;" to="/inscription">Inscription</router-link>
         </nav>
-        <a class="account-icon" :class="{ displayed: isAccountDisplayed }" @click.prevent="toggleAccountMenu()"><i class="fas fa-user-circle"></i></a>
+        <a class="account-icon" :class="{ displayed: isAccountDisplayed }" @click.prevent="toggleAccountMenu()">
+            <i class="fas fa-user-circle"></i>
+        </a>
         <div class="account-menu" :class="{ accountMenuDisplayed: isAccountMenuDisplayed }">
             <a>Voir ses messages</a>
-            <a>Désinscription</a>
-            <a>Déconnexion</a>
+            <a @click="signOut()">Désinscription</a>
+            <a @click="logOut()">Déconnexion</a>
         </div>
-        <a class="mobile-icon" @click.prevent="toggleMobileNav()"><i class="fas fa-bars"></i></a>
+        <a class="mobile-icon" :class="{ displayed: isMobileDisplayed }" @click.prevent="toggleMobileNav()">
+            <i class="fas fa-bars"></i>
+        </a>
     </header>
 </template>
 
@@ -28,6 +32,7 @@ export default {
     data() {
         return {
             isMenuDisplayed: true,
+            isMobileDisplayed: false,
             isMobileMenuDisplayed: false,
             isAccountDisplayed: false,
             isAccountMenuDisplayed: false,
@@ -40,19 +45,45 @@ export default {
         toggleAccountMenu() {
             this.isAccountMenuDisplayed = !this.isAccountMenuDisplayed;
         },
+        logOut() {
+            sessionStorage.clear();
+            location.reload();
+        },
+        signOut() {
+            if (confirm("Êtes vous sûr de vouloir supprimer votre compte ? Toutes les données associés seront perdus !")) {
+                fetch("http://localhost:3000/users/deleteAccount/" + sessionStorage.getItem("userId"), {
+                    method: "DELETE",
+                }).then((response) => {
+                    response.text().then((response) => {
+                        console.log(JSON.parse(response));
+                        sessionStorage.clear();
+                        location.reload();
+                    });
+                });
+            }
+        },
     },
     created() {
-        if (window.innerWidth < 492) {
+        // USER LOGIN ?
+        if (sessionStorage.getItem("password")) {
             this.isMenuDisplayed = false;
-        }
-        window.addEventListener("resize", () => {
+            this.isAccountDisplayed = true;
+        } else {
             if (window.innerWidth < 492) {
                 this.isMenuDisplayed = false;
+                this.isMobileDisplayed = true;
             }
-            if (window.innerWidth > 492) {
-                this.isMenuDisplayed = true;
-            }
-        });
+            window.addEventListener("resize", () => {
+                if (window.innerWidth < 492) {
+                    this.isMenuDisplayed = false;
+                    this.isMobileDisplayed = true;
+                }
+                if (window.innerWidth > 492) {
+                    this.isMenuDisplayed = true;
+                    this.isMobileDisplayed = false;
+                }
+            });
+        }
     },
 };
 </script>
@@ -64,10 +95,15 @@ header {
     height: 9vh;
     display: flex;
     align-items: center;
-    padding: 0 2rem 0 2rem;
+    // padding: 0 2rem 0 2rem;
     box-shadow: 10px 7px 20px -9px rgba(0, 0, 0, 0.72);
     background: white;
     z-index: 1;
+}
+@media (max-width: 490px) {
+    header {
+        padding: 0;
+    }
 }
 
 .logo {
@@ -78,17 +114,14 @@ header {
 }
 
 .logo img {
+    width: 120px;
+    height: 120px;
     position: relative;
     top: -15px;
 }
 
 nav {
     display: none;
-}
-@media (max-width: 492px) {
-    nav {
-        display: none;
-    }
 }
 
 nav a,
@@ -125,13 +158,8 @@ a:hover {
     display: none;
     font-size: 2rem;
     color: #2c3e50;
-    margin-left: 1rem;
+    margin-right: 1rem;
     cursor: pointer;
-}
-@media (max-width: 492px) {
-    .mobile-icon {
-        display: block;
-    }
 }
 
 // ACCOUNT MENU
@@ -153,7 +181,6 @@ a:hover {
 
 .account-menu a {
     font-weight: bold;
-    color: #2c3e50;
     cursor: pointer;
 }
 
@@ -161,7 +188,7 @@ a:hover {
     display: none;
     font-size: 2rem;
     color: #2c3e50;
-    margin-right: 2rem;
+    margin-right: 0.5rem;
     cursor: pointer;
 }
 

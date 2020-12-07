@@ -17,7 +17,6 @@ export default {
     },
     data() {
         return {
-
         }
     }
 };
@@ -34,6 +33,40 @@ export default {
     }
     &__message {
         font-size: 1.5vw;
+    }
+}
+@media (max-width: 1060px) {
+    .comment {
+        flex-direction: column;
+        &__author {
+            font-size: 1.7vw;
+        }
+        &__message {
+            font-size: 3vw;
+        }
+    }
+}
+@media (max-width: 764px) {
+    .comment {
+        flex-direction: column;
+        &__author {
+            font-size: 2.6vw;
+        }
+        &__message {
+            font-size: 3.6vw;
+        }
+    }
+}
+@media (max-width: 490px) {
+    .comment {
+        flex-direction: column;
+        padding: 10px;
+        &__author {
+            font-size: 3.4vw;
+        }
+        &__message {
+            font-size: 4.4vw;
+        }
     }
 }
 </style>
