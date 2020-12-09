@@ -76,13 +76,13 @@ export default {
             var form = {
                 user_id: sessionStorage.getItem("userId"),
                 post_id: this.id,
-                message: this.formComment,
+                message: this.formComment
             };
             fetch("http://localhost:3000/comments/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "authorization": sessionStorage.getItem("token"),
+                    "authorization": sessionStorage.getItem("token")
                 },
                 body: JSON.stringify(form),
             }).then((response) => {
@@ -99,7 +99,7 @@ export default {
             fetch("http://localhost:3000/posts/" + this.id, {
                 method: "DELETE",
                 headers: {
-                    "authorization": sessionStorage.getItem("token"),
+                    "authorization": sessionStorage.getItem("token")
                 },
             }).then((response) => {
                 response.text().then((response) => {
@@ -113,8 +113,8 @@ export default {
         },
     },
     beforeMount() {
-        // USER LOGIN ?
-        if (parseInt(sessionStorage.getItem("userId")) === this.user_id) {
+        // USER LOGIN OR ADMIN ?
+        if (parseInt(sessionStorage.getItem("userId")) === this.user_id || sessionStorage.getItem("admin") == true) {
             this.isEditButtonUserDisplayed = true;
         }
         // GET ALL COMMENTS
@@ -135,10 +135,11 @@ export default {
     height: auto;
     display: flex;
     flex-direction: column;
-    border: 2px solid black;
     border-radius: 10px;
     padding: 20px;
     margin-bottom: 20px;
+    background: white;
+    box-shadow: 15px 10px 38px -9px rgba(0, 0, 0, 0.75);
     &__contents {
         display: flex;
         flex-direction: column;
@@ -146,12 +147,13 @@ export default {
         align-items: flex-start;
     }
     &__author {
-        font-size: 13px;
+        font-size: 0.9rem;
         color: #2c3e50;
     }
     &__title {
         text-align: left;
-        font-size: 16px;
+        font-size: 1.4rem;
+        font-weight: bold;
     }
     &__img {
         width: 100%;
@@ -173,10 +175,10 @@ export default {
         border: none;
         border-radius: 28px;
         cursor: pointer;
-        color: #2c3e50;
-        background-color: #fff;
+        color: white;
+        background-color: #2F6CCC;
         font-family: Arial;
-        font-size: 14px;
+        font-size: 1rem;
         padding: 4px 8px;
         margin-right: 5px;
         text-decoration: none;
@@ -208,19 +210,19 @@ export default {
         }
     }
 }
-// @media (max-width: 1060px) {
-//     .post {
-//         &__author {
-//             font-size: 1.7vw;
-//         }
-//         &__title {
-//             font-size: 3vw;
-//         }
-//         &__button {
-//             font-size: 1.7vw;
-//         }
-//     }
-// }
+@media (max-width: 1060px) {
+    .post {
+        &__author {
+            font-size: 1rem;
+        }
+        &__title {
+            font-size: 1.6rem;
+        }
+        &__button {
+            font-size: 0.8rem;
+        }
+    }
+}
 // @media (max-width: 764px) {
 //     .post {
 //         &__author {

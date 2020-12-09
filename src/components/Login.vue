@@ -49,6 +49,7 @@ export default {
                         sessionStorage.setItem("userId", data.userId);
                         sessionStorage.setItem("token", data.token);
                         sessionStorage.setItem("password", data.verifyPassword);
+                        sessionStorage.setItem("admin", data.admin);
                         this.$router.push({name: "Accueil"});
                     }
                 });

@@ -69,7 +69,7 @@ export default {
             fetch("http://localhost:3000/posts/", {
                 method: "POST",
                 headers: {
-                    "authorization": sessionStorage.getItem("token"),
+                    authorization: sessionStorage.getItem("token"),
                 },
                 body: form,
             }).then((response) => {
@@ -86,7 +86,7 @@ export default {
             fetch("http://localhost:3000/posts/" + this.postTomodify_id, {
                 method: "PUT",
                 headers: {
-                    "authorization": sessionStorage.getItem("token"),
+                    authorization: sessionStorage.getItem("token"),
                 },
                 body: form,
             }).then((response) => {
@@ -201,17 +201,25 @@ export default {
 }
 
 .posts-container {
-    width: 100%;
+    width: 50%;
     display: flex;
     flex-direction: column;
     padding: 20px;
     margin-top: 5vh;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 15px 10px 38px -9px rgba(0, 0, 0, 0.75);
+}
+@media (max-width: 1060px) {
+    .posts-container {
+        width: 70%;
+    }
+}
+@media (max-width: 764px) {
+    .posts-container {
+        width: 80%;
+    }
 }
 @media (max-width: 490px) {
     .posts-container {
+        width: 100%;
         padding: 5px;
     }
 }

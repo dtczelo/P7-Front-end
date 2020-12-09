@@ -110,6 +110,7 @@ header {
     text-align: left;
     flex: 1;
     height: 9vh;
+    padding-left: 2rem;
     overflow: hidden;
 }
 
@@ -122,6 +123,7 @@ header {
 
 nav {
     display: none;
+    padding-right: 2rem;
 }
 
 nav a,
@@ -189,6 +191,7 @@ a:hover {
     font-size: 2rem;
     color: #2c3e50;
     margin-right: 0.5rem;
+    padding-right: 2rem;
     cursor: pointer;
 }
 
