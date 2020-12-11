@@ -1,12 +1,12 @@
 <template>
     <header>
         <div class="mobile-nav" :class="{ mobileDisplayed: isMobileMenuDisplayed }">
-            <router-link style="text-decoration: none;" to="/">Home</router-link>
-            <router-link style="text-decoration: none;" to="/connexion">Connexion</router-link>
-            <router-link style="text-decoration: none;" to="/inscription">Inscription</router-link>
+            <router-link style="text-decoration: none;" to="/" @click.native="toggleMobileNav()">Home</router-link>
+            <router-link style="text-decoration: none;" to="/connexion" @click.native="toggleMobileNav()">Connexion</router-link>
+            <router-link style="text-decoration: none;" to="/inscription" @click.native="toggleMobileNav()">Inscription</router-link>
         </div>
         <div class="logo">
-            <img src="../assets/images/icon-above-font.png" alt="Logo de l'entreprise Groupomania" />
+            <img :src="logo" alt="Logo de l'entreprise Groupomania" />
         </div>
         <nav :class="{ displayed: isMenuDisplayed }">
             <router-link style="text-decoration: none;" to="/">Home</router-link> |
@@ -36,6 +36,7 @@ export default {
             isMobileMenuDisplayed: false,
             isAccountDisplayed: false,
             isAccountMenuDisplayed: false,
+            logo: require("../assets/images/icon-above-font.png"),
         };
     },
     methods: {
@@ -72,15 +73,18 @@ export default {
             if (window.innerWidth < 492) {
                 this.isMenuDisplayed = false;
                 this.isMobileDisplayed = true;
+                this.logo = require("../assets/images/icon-left-font.png");
             }
             window.addEventListener("resize", () => {
                 if (window.innerWidth < 492) {
                     this.isMenuDisplayed = false;
                     this.isMobileDisplayed = true;
+                    this.logo = require("../assets/images/icon-left-font.png");
                 }
                 if (window.innerWidth > 492) {
                     this.isMenuDisplayed = true;
                     this.isMobileDisplayed = false;
+                    this.logo = require("../assets/images/icon-above-font.png");
                 }
             });
         }
@@ -95,7 +99,6 @@ header {
     height: 9vh;
     display: flex;
     align-items: center;
-    // padding: 0 2rem 0 2rem;
     box-shadow: 10px 7px 20px -9px rgba(0, 0, 0, 0.72);
     background: white;
     z-index: 1;
@@ -112,13 +115,17 @@ header {
     height: 9vh;
     padding-left: 2rem;
     overflow: hidden;
+    & img {
+        width: 120px;
+        height: 120px;
+        position: relative;
+        top: -15px;
+    }
 }
-
-.logo img {
-    width: 120px;
-    height: 120px;
-    position: relative;
-    top: -15px;
+@media (max-width: 490px) {
+    .logo {
+        padding-left: 0.5rem;
+    }
 }
 
 nav {

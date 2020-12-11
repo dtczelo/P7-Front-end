@@ -21,6 +21,8 @@
 </template>
 
 <script>
+import { bus } from "../main";
+
 export default {
     data() {
         return {
@@ -43,16 +45,23 @@ export default {
                 body: JSON.stringify(form),
             };
             fetch("http://localhost:3000/users/login", myInit).then((response) => {
-                response.text().then((response) => {
-                    var data = JSON.parse(response);
-                    if (data.verifyPassword) {
-                        sessionStorage.setItem("userId", data.userId);
-                        sessionStorage.setItem("token", data.token);
-                        sessionStorage.setItem("password", data.verifyPassword);
-                        sessionStorage.setItem("admin", data.admin);
-                        this.$router.push({name: "Accueil"});
-                    }
-                });
+                if (response.ok) {
+                    response.text().then((response) => {
+                        var data = JSON.parse(response);
+                        if (data.verifyPassword) {
+                            sessionStorage.setItem("userId", data.userId);
+                            sessionStorage.setItem("token", data.token);
+                            sessionStorage.setItem("password", data.verifyPassword);
+                            sessionStorage.setItem("role", data.role);
+                            bus.$emit('reRenderHeader');
+                            this.$router.push({ name: "Accueil" });
+                        }
+                    });
+                } else {
+                    response.text().then((response) => {
+                        alert(JSON.parse(response).alert);
+                    });
+                }
             });
         },
     },
@@ -137,5 +146,6 @@ export default {
     color: white;
     font-size: large;
     border-radius: 10px;
+    cursor: pointer;
 }
 </style>

@@ -1,23 +1,25 @@
 <template>
     <div class="post">
         <div class="post__contents">
-            <p class="post__author">Par "{{ author }}" <span class="dot-centered">·</span> {{ date }}</p>
+            <p class="post__author">
+                <span class="author">{{ author }}</span
+                ><br />Publié le {{ date }}
+            </p>
             <p class="post__title">{{ title }}</p>
             <div class="post__img" :class="{ imgZoom: isImgZoom }">
                 <img :src="imageUrl" @click="zoom()" />
             </div>
             <div class="post__buttons">
-                <a class="post__button post__button--user" :class="{ displayed: isEditButtonUserDisplayed }" @click="emitModifyPost()"
+                <a class="post__button post__button--user post__button--modify" :class="{ displayed: isEditButtonUserDisplayed }" @click="emitModifyPost()"
                     >Modifier</a
                 >
-                <a class="post__button post__button--user" :class="{ displayed: isEditButtonUserDisplayed }" @click="deletePost()"
-                    >Supprimer</a
+                <a class="post__button post__button--user post__button--delete" :class="{ displayed: isEditButtonUserDisplayed }" @click.prevent="deletePost()"
+                    ><i class="far fa-trash-alt"></i></a
                 >
-                <a class="post__button post__button--comments" @click="toggleComments()">Commentaires</a>
+                <a class="post__button post__button--comments" @click="toggleComments()"><i class="far fa-comment-alt"></i></a>
             </div>
         </div>
         <div class="post__comments" :class="{ displayed: isCommentsDisplayed }">
-            <h5>Commentaires</h5>
             <div class="comments-container">
                 <div v-for="comment in commentsToDisplayed" :key="comment.id">
                     <Comments
@@ -39,7 +41,7 @@
                     placeholder="Tapez votre commentaires ici..."
                     v-model="formComment"
                 ></textarea>
-                <button class="post__button" @click="postComment()">Envoyer</button>
+                <button class="post__button" @click="postComment()"><i class="fas fa-share"></i></button>
             </form>
         </div>
     </div>
@@ -76,19 +78,18 @@ export default {
             var form = {
                 user_id: sessionStorage.getItem("userId"),
                 post_id: this.id,
-                message: this.formComment
+                message: this.formComment,
             };
             fetch("http://localhost:3000/comments/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "authorization": sessionStorage.getItem("token")
+                    authorization: sessionStorage.getItem("token"),
                 },
                 body: JSON.stringify(form),
             }).then((response) => {
                 response.text().then((response) => {
                     console.log(JSON.parse(response));
-                    this.$forceUpdate;
                 });
             });
         },
@@ -99,12 +100,12 @@ export default {
             fetch("http://localhost:3000/posts/" + this.id, {
                 method: "DELETE",
                 headers: {
-                    "authorization": sessionStorage.getItem("token")
+                    authorization: sessionStorage.getItem("token"),
                 },
             }).then((response) => {
                 response.text().then((response) => {
                     console.log(JSON.parse(response));
-                    alert("Post Supprimé !");
+                    this.$emit("post-update-after-delete", { id: this.id });
                 });
             });
         },
@@ -114,7 +115,7 @@ export default {
     },
     beforeMount() {
         // USER LOGIN OR ADMIN ?
-        if (parseInt(sessionStorage.getItem("userId")) === this.user_id || sessionStorage.getItem("admin") == true) {
+        if (parseInt(sessionStorage.getItem("userId")) === this.user_id || sessionStorage.getItem("role") === "ADM") {
             this.isEditButtonUserDisplayed = true;
         }
         // GET ALL COMMENTS
@@ -122,7 +123,10 @@ export default {
             method: "GET",
         }).then((response) => {
             response.text().then((response) => {
-                this.commentsToDisplayed = JSON.parse(response).results;
+                for (var comment of JSON.parse(response).results) {
+                    comment.date = new Date(comment.date).toLocaleString();
+                    this.commentsToDisplayed.push(comment);
+                }
             });
         });
     },
@@ -147,8 +151,11 @@ export default {
         align-items: flex-start;
     }
     &__author {
+        text-align: left;
         font-size: 0.9rem;
         color: #2c3e50;
+        line-height: 1.2rem;
+        font-style: italic;
     }
     &__title {
         text-align: left;
@@ -165,7 +172,7 @@ export default {
         }
     }
     &__buttons {
-        width: 20%;
+        width: 35%;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -176,16 +183,19 @@ export default {
         border-radius: 28px;
         cursor: pointer;
         color: white;
-        background-color: #2F6CCC;
+        background-color: #2f6ccc;
         font-family: Arial;
         font-size: 1rem;
-        padding: 4px 8px;
-        margin-right: 5px;
+        padding: 8px 16px;
+        margin-right: 10px;
         text-decoration: none;
         box-shadow: 9px 5px 15px -9px rgba(0, 0, 0, 0.75);
         transition: all 250ms ease-in-out;
         &--user {
             display: none;
+        }
+        &--delete {
+            background-color: #FD2D01;
         }
         &:hover {
             background-color: #2c3e50;
@@ -198,15 +208,23 @@ export default {
     }
     &__comments {
         display: none;
-        padding: 15px;
+        padding: 5px;
         flex: 1;
         & form {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: space-between;
+        }
+        & button {
+            margin-left: 1rem;
         }
         & textarea {
-            width: 100%;
+            flex: 1;
+            padding: 5px;
+            border-radius: 4px;
+            &:focus {
+                border:2px solid #2f6bca;
+                outline: none;
+            }
         }
     }
 }
@@ -255,18 +273,13 @@ export default {
 }
 
 .comments-container {
-    max-height: 250px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 5px;
-    border: solid 1px black;
-    overflow-y: auto;
-    scroll-behavior: auto;
 }
 
-.dot-centered {
-    font-weight: 1000;
+.author {
+    color: #2f6bca;
 }
 
 .displayed {

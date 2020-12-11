@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <Header></Header>
+        <Header :key="renderHeaderKey"></Header>
         <router-view />
         <Footer></Footer>
     </div>
@@ -9,6 +9,7 @@
 <script>
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { bus } from "./main";
 
 export default {
     components: {
@@ -16,11 +17,15 @@ export default {
         Footer
     },
     data() {
-        return {};
+        return {
+            renderHeaderKey: 0
+        };
     },
-    created() {
-        window.addEventListener("resize", this.$store.commit("setWindowWidth"));
-    },
+    updated() {
+        bus.$on('reRenderHeader', () => {
+            this.renderHeaderKey++;
+        });
+    }
 };
 </script>
 
@@ -41,7 +46,8 @@ body {
     text-align: center;
     color: #2c3e50;
     background-attachment: fixed;
-    background-image: radial-gradient(circle at 17% 77%, rgba(17, 17, 17,0.04) 0%, rgba(17, 17, 17,0.04) 50%,rgba(197, 197, 197,0.04) 50%, rgba(197, 197, 197,0.04) 100%),radial-gradient(circle at 26% 17%, rgba(64, 64, 64,0.04) 0%, rgba(64, 64, 64,0.04) 50%,rgba(244, 244, 244,0.04) 50%, rgba(244, 244, 244,0.04) 100%),radial-gradient(circle at 44% 60%, rgba(177, 177, 177,0.04) 0%, rgba(177, 177, 177,0.04) 50%,rgba(187, 187, 187,0.04) 50%, rgba(187, 187, 187,0.04) 100%),linear-gradient(19deg, rgb(19,66,143),rgb(29,102,219));
+    background-image: url("./assets/images/sunset.jpg");
+    background-position: bottom;
     z-index: -2;
 }
 </style>

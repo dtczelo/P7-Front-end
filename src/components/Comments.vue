@@ -1,6 +1,6 @@
 <template>
     <div class="comment">
-        <p class="comment__author">Par "{{ author }}" <span class="dot-centered">·</span> {{ date }}</p>
+        <p class="comment__author"><span class="author">{{ author }}</span> le {{ date }}</p>
         <p class="comment__message">{{ message }}</p>
     </div>
 </template>
@@ -28,44 +28,43 @@ export default {
     text-align: left;
     &__author {
         margin-bottom: 2px;
-        font-size: 1vw;
+        font-size: 0.9rem;
         color: #2c3e50;
+        font-style: italic;
     }
     &__message {
-        font-size: 1.5vw;
+        margin: 0.5rem 0 0.7rem 0;
+        font-size: 1.2rem;
     }
 }
 @media (max-width: 1060px) {
     .comment {
-        flex-direction: column;
         &__author {
-            font-size: 1.7vw;
+            font-size: 1rem;
         }
         &__message {
-            font-size: 3vw;
+            font-size: 1.4rem;
         }
     }
 }
 @media (max-width: 764px) {
     .comment {
-        flex-direction: column;
         &__author {
-            font-size: 2.6vw;
+            // font-size: 2.6vw;
         }
         &__message {
-            font-size: 3.6vw;
+            // font-size: 3.6vw;
         }
     }
 }
 @media (max-width: 490px) {
     .comment {
-        flex-direction: column;
         padding: 10px;
         &__author {
-            font-size: 3.4vw;
+            // font-size: 3.4vw;
         }
         &__message {
-            font-size: 4.4vw;
+            // font-size: 4.4vw;
         }
     }
 }

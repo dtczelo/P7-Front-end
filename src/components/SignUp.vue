@@ -55,16 +55,16 @@ export default {
                 body: JSON.stringify(form),
             };
             fetch("http://localhost:3000/users/signup", myInit).then((response) => {
-                response.text().then((response) => {
-                    console.log(JSON.parse(response));
-                    // var data = JSON.parse(response);
-                    // if (data.verifyPassword) {
-                    //     sessionStorage.setItem("userId", data.userId);
-                    //     sessionStorage.setItem("token", data.token);
-                    //     sessionStorage.setItem("password", data.verifyPassword);
-                        this.$router.push({name: "Accueil"});
-                    // }
-                });
+                if (response.ok) {
+                    response.text().then((response) => {
+                        console.log(JSON.parse(response));
+                        this.$router.push({ name: "Connexion" });
+                    });
+                } else {
+                    response.text().then((response) => {
+                        alert(JSON.parse(response).alert);
+                    });
+                }
             });
         },
     },
@@ -150,5 +150,6 @@ export default {
     color: white;
     font-size: large;
     border-radius: 10px;
+    cursor: pointer;
 }
 </style>
