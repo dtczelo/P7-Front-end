@@ -168,8 +168,8 @@ export default {
             this.formForPublish = false;
             this.formTitle = payload.title;
             this.postTomodify_id = payload.id;
-            this.image = payload.imageUrl;
-            this.imagePreview = payload.imageUrl;
+            // this.image = payload.imageUrl;
+            // this.imagePreview = payload.imageUrl;
         },
         postUpdateAfterDelete(payload) {
             const newPostsArray = this.postsToDisplayed.filter((post) => post.id !== payload.id);
