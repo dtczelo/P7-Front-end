@@ -8,20 +8,19 @@
         <div class="logo">
             <img :src="logo" alt="Logo de l'entreprise Groupomania" />
         </div>
-        <nav :class="{ displayed: isMenuDisplayed }">
+        <nav v-if="isMenuDisplayed">
             <router-link style="text-decoration: none;" to="/">Home</router-link> |
             <router-link style="text-decoration: none;" to="/connexion">Connexion</router-link> |
             <router-link style="text-decoration: none;" to="/inscription">Inscription</router-link>
         </nav>
-        <a class="account-icon" :class="{ displayed: isAccountDisplayed }" @click.prevent="toggleAccountMenu()">
+        <a class="account-icon" v-if="isAccountDisplayed" @click.prevent="toggleAccountMenu()">
             <i class="fas fa-user-circle"></i>
         </a>
         <div class="account-menu" :class="{ accountMenuDisplayed: isAccountMenuDisplayed }">
-            <a>Voir ses messages</a>
             <a @click="signOut()">Désinscription</a>
             <a @click="logOut()">Déconnexion</a>
         </div>
-        <a class="mobile-icon" :class="{ displayed: isMobileDisplayed }" @click.prevent="toggleMobileNav()">
+        <a class="mobile-icon" v-if="isMobileDisplayed" @click.prevent="toggleMobileNav()">
             <i class="fas fa-bars"></i>
         </a>
     </header>
@@ -129,7 +128,6 @@ header {
 }
 
 nav {
-    display: none;
     padding-right: 2rem;
 }
 
@@ -164,7 +162,6 @@ a:hover {
 }
 
 .mobile-icon {
-    display: none;
     font-size: 2rem;
     color: #2c3e50;
     margin-right: 1rem;
@@ -194,7 +191,6 @@ a:hover {
 }
 
 .account-icon {
-    display: none;
     font-size: 2rem;
     color: #2c3e50;
     margin-right: 0.5rem;
@@ -206,10 +202,6 @@ a:hover {
 
 .mobileDisplayed {
     transform: translateY(0);
-}
-
-.displayed {
-    display: block;
 }
 
 .accountMenuDisplayed {

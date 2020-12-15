@@ -8,7 +8,7 @@
             <form id="formSignup">
                 <div>
                     <p>Nom:</p>
-                    <input type="text" placeholder="Entrez votre nom" v-model="lastname" />
+                    <input type="text" ref="lastname" placeholder="Entrez votre nom" v-model="lastname" />
                 </div>
                 <div>
                     <p>Prénom:</p>
@@ -39,35 +39,51 @@ export default {
         };
     },
     methods: {
+        warning(field) {
+            this.$toastr.warning("Veuillez compléter le champ " + field + " !", "Attention");
+        },
         signUp() {
-            var form = {
-                lastname: this.lastname,
-                firstname: this.firstname,
-                email: this.email,
-                password: this.password,
-            };
-            var myInit = {
-                method: "POST",
-                headers: {
-                    Accept: "application/json, text/plain, */*",
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(form),
-            };
-            fetch("http://localhost:3000/users/signup", myInit).then((response) => {
-                if (response.ok) {
-                    response.text().then((response) => {
-                        console.log(JSON.parse(response));
-                        this.$router.push({ name: "Connexion" });
-                    });
-                } else {
-                    response.text().then((response) => {
-                        alert(JSON.parse(response).alert);
-                    });
-                }
-            });
+            if (this.lastname == "") {
+                this.warning("nom");
+            } else if (this.firstname == "") {
+                this.warning("prénom");
+            } else if (this.email == "") {
+                this.warning("email");
+            } else if (this.password == "") {
+                this.warning("mot de passe");
+            } else {
+                var form = {
+                    lastname: this.lastname,
+                    firstname: this.firstname,
+                    email: this.email,
+                    password: this.password,
+                };
+                var myInit = {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json, text/plain, */*",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(form),
+                };
+                fetch("http://localhost:3000/users/signup", myInit).then((response) => {
+                    if (response.ok) {
+                        response.text().then((response) => {
+                            this.$router.push({ name: "Connexion" });
+                            this.$toastr.success("", JSON.parse(response).message);
+                        });
+                    } else {
+                        response.text().then((response) => {
+                            this.$toastr.warning(JSON.parse(response).alert, "Attention");
+                        });
+                    }
+                });
+            }
         },
     },
+        mounted() {
+        this.$refs.lastname.focus();
+    }
 };
 </script>
 
@@ -111,10 +127,6 @@ export default {
     border-bottom: 1px solid rgba(0, 0, 0, 0.609);
     cursor: pointer;
     transition: border-bottom 300ms;
-}
-
-.box div input:focus {
-    // border-bottom: 2px solid #b20a2c;
 }
 
 .box h1 {

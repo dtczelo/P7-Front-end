@@ -10,16 +10,14 @@
                 <img :src="imageUrl" @click="zoom()" />
             </div>
             <div class="post__buttons">
-                <a class="post__button post__button--user post__button--modify" :class="{ displayed: isEditButtonUserDisplayed }" @click="emitModifyPost()"
-                    >Modifier</a
-                >
-                <a class="post__button post__button--user post__button--delete" :class="{ displayed: isEditButtonUserDisplayed }" @click.prevent="deletePost()"
-                    ><i class="far fa-trash-alt"></i></a
-                >
+                <a class="post__button post__button--modify" v-if="isEditButtonUserDisplayed" @click="emitModifyPost()">Modifier</a>
+                <a class="post__button post__button--delete" v-if="isEditButtonUserDisplayed" @click.prevent="deletePost()"
+                    ><i class="far fa-trash-alt"></i
+                ></a>
                 <a class="post__button post__button--comments" @click="toggleComments()"><i class="far fa-comment-alt"></i></a>
             </div>
         </div>
-        <div class="post__comments" :class="{ displayed: isCommentsDisplayed }">
+        <div class="post__comments" v-if="isCommentsDisplayed">
             <div class="comments-container">
                 <div v-for="comment in commentsToDisplayed" :key="comment.id">
                     <Comments
@@ -29,19 +27,21 @@
                         :author="comment.author"
                         :date="comment.date"
                         :message="comment.message"
+                        @comment-update-after-delete="commentUpdateAfterDelete"
                     ></Comments>
                 </div>
             </div>
-            <form @keyup.enter="postComment()">
+            <form v-if="isPostCommentDisplayed" @keyup.enter="postComment()">
                 <textarea
                     name="formComment"
                     id=""
                     cols="auto"
                     rows="2"
                     placeholder="Tapez votre commentaires ici..."
+                    ref="commentInput"
                     v-model="formComment"
                 ></textarea>
-                <button class="post__button" @click="postComment()"><i class="fas fa-share"></i></button>
+                <button class="post__button" @click.prevent="postComment()"><i class="fas fa-share"></i></button>
             </form>
         </div>
     </div>
@@ -68,11 +68,17 @@ export default {
             formComment: this.message,
             commentsToDisplayed: [],
             isImgZoom: false,
+            isPostCommentDisplayed: false,
         };
     },
     methods: {
         toggleComments() {
             this.isCommentsDisplayed = !this.isCommentsDisplayed;
+            if (this.isCommentsDisplayed) {
+                this.$nextTick(() => {
+                    this.$refs.commentInput.focus();
+                });
+            }
         },
         postComment() {
             var form = {
@@ -89,7 +95,10 @@ export default {
                 body: JSON.stringify(form),
             }).then((response) => {
                 response.text().then((response) => {
-                    console.log(JSON.parse(response));
+                    this.formComment = "";
+                    this.commentsToDisplayed = [];
+                    this.getAllComments();
+                    this.$toastr.success("", JSON.parse(response).message);
                 });
             });
         },
@@ -103,32 +112,52 @@ export default {
                     authorization: sessionStorage.getItem("token"),
                 },
             }).then((response) => {
-                response.text().then((response) => {
-                    console.log(JSON.parse(response));
-                    this.$emit("post-update-after-delete", { id: this.id });
-                });
+                if (response.ok) {
+                    response.text().then((response) => {
+                        this.$emit("post-update-after-delete", { id: this.id, message: JSON.parse(response).message });
+                    });
+                } else {
+                    response.text().then((response) => {
+                        this.$toastr.error("", JSON.parse(response).alert);
+                    });
+                }
             });
         },
         zoom() {
             this.isImgZoom = !this.isImgZoom;
         },
+        getAllComments() {
+            fetch("http://localhost:3000/comments/" + this.id, {
+                method: "GET",
+            }).then((response) => {
+                response.text().then((response) => {
+                    for (var comment of JSON.parse(response).results) {
+                        comment.date = new Date(comment.date).toLocaleString();
+                        this.commentsToDisplayed.push(comment);
+                    }
+                });
+            });
+        },
+        commentUpdateAfterDelete(payload) {
+            const newCommentsArray = this.commentsToDisplayed.filter((comment) => comment.id !== payload.id);
+            this.commentsToDisplayed = newCommentsArray;
+            this.$toastr.success("", payload.message);
+        },
     },
     beforeMount() {
-        // USER LOGIN OR ADMIN ?
+        this.getAllComments();
+        // USER LOGIN
+        if (sessionStorage.getItem("password")) {
+            this.isPostCommentDisplayed = true;
+            this.$nextTick(() => {
+                this.isCommentsDisplayed = false;
+            });
+        }
+        // USER's POSTS OR ADMIN ?
         if (parseInt(sessionStorage.getItem("userId")) === this.user_id || sessionStorage.getItem("role") === "ADM") {
             this.isEditButtonUserDisplayed = true;
+            this.isCommentsDisplayed = true;
         }
-        // GET ALL COMMENTS
-        fetch("http://localhost:3000/comments/" + this.id, {
-            method: "GET",
-        }).then((response) => {
-            response.text().then((response) => {
-                for (var comment of JSON.parse(response).results) {
-                    comment.date = new Date(comment.date).toLocaleString();
-                    this.commentsToDisplayed.push(comment);
-                }
-            });
-        });
     },
 };
 </script>
@@ -191,11 +220,8 @@ export default {
         text-decoration: none;
         box-shadow: 9px 5px 15px -9px rgba(0, 0, 0, 0.75);
         transition: all 250ms ease-in-out;
-        &--user {
-            display: none;
-        }
         &--delete {
-            background-color: #FD2D01;
+            background-color: #fd2d01;
         }
         &:hover {
             background-color: #2c3e50;
@@ -206,8 +232,10 @@ export default {
             top: 1px;
         }
     }
+    & form {
+        margin-top: 20px;
+    }
     &__comments {
-        display: none;
         padding: 5px;
         flex: 1;
         & form {
@@ -222,7 +250,7 @@ export default {
             padding: 5px;
             border-radius: 4px;
             &:focus {
-                border:2px solid #2f6bca;
+                border: 2px solid #2f6bca;
                 outline: none;
             }
         }
@@ -241,34 +269,12 @@ export default {
         }
     }
 }
-// @media (max-width: 764px) {
-//     .post {
-//         &__author {
-//             font-size: 2.6vw;
-//         }
-//         &__title {
-//             font-size: 3.6vw;
-//         }
-//         &__button {
-//             font-size: 2.6vw;
-//         }
-//     }
-// }
 @media (max-width: 490px) {
     .post {
         padding: 10px;
-        // &__author {
-        //     font-size: 4vw;
-        // }
-        // &__title {
-        //     font-size: 5vw;
-        // }
         &__img {
             padding: 5px;
         }
-        // &__button {
-        //     font-size: 3.8vw;
-        // }
     }
 }
 
@@ -280,10 +286,6 @@ export default {
 
 .author {
     color: #2f6bca;
-}
-
-.displayed {
-    display: block;
 }
 
 .imgZoom {

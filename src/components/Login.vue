@@ -8,7 +8,7 @@
             <form id="formLogin">
                 <div>
                     <p>Email:</p>
-                    <input type="email" placeholder="Entrez votre email" v-model="email" />
+                    <input type="email" ref="email" placeholder="Entrez votre email" v-model="email" />
                 </div>
                 <div>
                     <p>Password:</p>
@@ -59,12 +59,15 @@ export default {
                     });
                 } else {
                     response.text().then((response) => {
-                        alert(JSON.parse(response).alert);
+                        this.$toastr.warning(JSON.parse(response).alert, "Attention");
                     });
                 }
             });
         },
     },
+    mounted() {
+        this.$refs.email.focus();
+    }
 };
 </script>
 
@@ -107,10 +110,6 @@ export default {
     border-bottom: 1px solid rgba(0, 0, 0, 0.609);
     cursor: pointer;
     transition: border-bottom 300ms;
-}
-
-.box div input:focus {
-    // border-bottom: 2px solid #b20a2c;
 }
 
 .box h1 {

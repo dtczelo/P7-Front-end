@@ -8,10 +8,9 @@
         </div>
         <div v-else>
             <main class="home">
-                <a class="create-post" :class="{ displayed: isFormButtonDisplayed }" @click="toggleForm()"
-                    ><i class="fas fa-plus-circle"></i><br />
-                    Publier</a
-                >
+                <a class="create-post" v-if="isFormButtonDisplayed" @click="toggleForm()">
+                    <i class="fas fa-plus-circle"></i><span>Publier</span>
+                </a>
                 <transition name="formTranslate">
                     <div v-if="isFormDisplayed" class="form-container">
                         <i class="fas fa-times" @click="toggleForm()"></i>
@@ -25,6 +24,7 @@
                                 placeholder="Titre (max= 255 caractères)"
                                 maxlength="255"
                                 autofocus
+                                ref="postInput"
                                 v-model="formTitle"
                             ></textarea>
                             <div v-if="!imagePreview" class="image-preview">
@@ -33,10 +33,10 @@
                             </div>
                             <div v-else class="image-preview">
                                 <img :src="imagePreview" width="100" height="60" />
-                                <button class="post__button" @click="removeImage()">Supprimez cette image</button>
+                                <button class="post__button" @click="removeImage()">Changez d'image</button>
                             </div>
-                            <button class="post__button" v-if="formForPublish === true" @click="postData()">Publier</button>
-                            <button class="post__button" v-else @click="modifyData()">Modifier</button>
+                            <button class="post__button" v-if="formForPublish === true" @click.prevent="postData()">Publier</button>
+                            <button class="post__button" v-else @click.prevent="modifyData()">Modifier</button>
                         </form>
                     </div>
                 </transition>
@@ -100,13 +100,18 @@ export default {
         toggleForm() {
             this.formForPublish = true;
             this.isFormDisplayed = !this.isFormDisplayed;
+            if (this.isFormDisplayed) {
+                this.$nextTick(() => {
+                    this.$refs.postInput.focus();
+                });
+            }
         },
         formChek() {
-            if (this.formTitle == undefined) {
-                alert("Veuillez choisir un titre !");
+            if (!this.formTitle) {
+                this.$toastr.warning("Veuillez choisir un titre !", "Attention");
                 return false;
-            } else if (this.image == undefined) {
-                alert("Veuillez choisir une image !");
+            } else if (!this.image) {
+                this.$toastr.warning("Veuillez choisir une image !", "Attention");
                 return false;
             } else {
                 return true;
@@ -127,7 +132,10 @@ export default {
                     body: form,
                 }).then((response) => {
                     response.text().then((response) => {
-                        console.log(JSON.parse(response));
+                        this.toggleForm();
+                        this.postsToDisplayed = [];
+                        this.getAllPosts();
+                        this.$toastr.success("", JSON.parse(response).message);
                     });
                 });
             }
@@ -147,8 +155,10 @@ export default {
                     body: form,
                 }).then((response) => {
                     response.text().then((response) => {
-                        console.log(JSON.parse(response));
                         this.toggleForm();
+                        this.postsToDisplayed = [];
+                        this.getAllPosts();
+                        this.$toastr.success("", JSON.parse(response).message);
                     });
                 });
             }
@@ -158,11 +168,13 @@ export default {
             this.formForPublish = false;
             this.formTitle = payload.title;
             this.postTomodify_id = payload.id;
+            this.image = payload.imageUrl;
             this.imagePreview = payload.imageUrl;
         },
         postUpdateAfterDelete(payload) {
-            const newPostsArray = this.postsToDisplayed.filter(post => post.id !== payload.id);
+            const newPostsArray = this.postsToDisplayed.filter((post) => post.id !== payload.id);
             this.postsToDisplayed = newPostsArray;
+            this.$toastr.success("", payload.message);
         },
         getAllPosts() {
             fetch("http://localhost:3000/posts/", {
@@ -252,13 +264,17 @@ export default {
 }
 
 .create-post {
-    display: none;
     position: fixed;
-    height: 40px;
-    width: 100px;
+    height: auto;
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.2rem 0;
     background: white;
     line-height: 1.1rem;
     color: #2c3e50;
+    font-size: 0.9rem;
     text-decoration: none;
     border-radius: 0 0 10px 10px;
     border-left: solid 2px black;
@@ -267,6 +283,13 @@ export default {
     box-shadow: 3px 17px 21px -2px rgba(0, 0, 0, 0.37);
     cursor: pointer;
     z-index: 1;
+    & span {
+        margin-top: 0.2rem;
+        font-weight: bold;
+    }
+    &:hover span {
+        display: block;
+    }
 }
 
 .form-container {
@@ -350,11 +373,8 @@ export default {
 .formTranslate-leave-active {
     transition: transform 0.3s ease-in-out;
 }
-.formTranslate-enter, .formTranslate-leave-to /* .fade-leave-active below version 2.1.8 */ {
+.formTranslate-enter,
+.formTranslate-leave-to {
     transform: translateY(-100%);
-}
-
-.displayed {
-    display: block;
 }
 </style>
