@@ -74,7 +74,7 @@ export default {
     methods: {
         toggleComments() {
             this.isCommentsDisplayed = !this.isCommentsDisplayed;
-            if (this.isCommentsDisplayed) {
+            if (this.isCommentsDisplayed && sessionStorage.getItem("password")) {
                 this.$nextTick(() => {
                     this.$refs.commentInput.focus();
                 });

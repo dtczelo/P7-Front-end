@@ -249,17 +249,17 @@ export default {
     min-height: 70vh;
     display: flex;
     justify-content: space-around;
-    padding: 9vh 10rem 18vh 10rem;
+    padding: 90px 10rem 90px 10rem;
     opacity: 0.99;
 }
 @media (max-width: 1060px) {
     .home {
-        padding: 9vh 2rem 0 2rem;
+        padding: 90px 2rem 90px 2rem;
     }
 }
 @media (max-width: 490px) {
     .home {
-        padding: 9vh 0.5rem 0 0.5rem;
+        padding: 90px 0.5rem 90px 0.5rem;
     }
 }
 

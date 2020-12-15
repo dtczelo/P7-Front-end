@@ -95,7 +95,7 @@ export default {
 header {
     position: fixed;
     width: 100%;
-    height: 9vh;
+    height: 90px;
     display: flex;
     align-items: center;
     box-shadow: 10px 7px 20px -9px rgba(0, 0, 0, 0.72);
